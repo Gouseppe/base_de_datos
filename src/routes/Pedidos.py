@@ -22,28 +22,28 @@ def get_Pedidos():
     
     try:
         if(date and status and cedula):
-            print('todo')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 1)
         elif(date and status and not cedula):
-            print('date y status')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 2)
         elif(date and not status and cedula):
-            print('date y cedula')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 3)
         elif(not date and status and cedula):
-            print('status y cedula')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 4)
         elif(date and not status and not cedula):
-            print('solo date')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 5)
         elif(status and not date and not cedula):
-            print('solo status')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 6)
         elif(cedula and not date and not status):
-            print('solo cedula')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 7)
         else:
-            print('todo')
+            
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 8)
 
 

@@ -44,21 +44,22 @@ class OrderModel():
     
 
     @classmethod
-    def get_Pedido(self, id):
+    def get_Pedido(self):
         try:
             connection = get_connection()
 
             with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM pedidos WHERE ID = %s", (id,))
+                # cursor.execute("SELECT * FROM pedidos WHERE ID = %s", (id,))
+                cursor.execute("SELECT * FROM pedidos WHERE order_number=(select max(order_number) from pedidos)")
                 row = cursor.fetchone()
 
-                Pedido = None
+                
                 if row:
-                    Pedido = Pedido(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
-                    Pedido = Pedido.to_JSON()
+                    pedido = Pedido(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11])
+                    pedido = pedido.to_JSON()
 
             connection.close()
-            return Pedido
+            return pedido
         except Exception as ex:
             raise Exception(ex)
 
@@ -71,7 +72,7 @@ class OrderModel():
            
             with connection.cursor() as cursor:
                 cursor.execute("""INSERT INTO pedidos (quantity, delivery_amount, total, payments_screenshot, status, datatime, city, municipality, payment_method, remarks, Cedula) 
-                    VALUES (%s, %s, %s, %s::bytea, %s, localtimestamp(0), %s, %s, %s, %s, %s)""", (Pedido.quantity, Pedido.delivery_amount, Pedido.total, Pedido.payment_screenshot, Pedido.status, Pedido.city, Pedido.municipality, Pedido.payment_method, Pedido.remarks, Pedido.cedula))
+                    VALUES (%s, %s, %s, %s, %s, localtimestamp(0), %s, %s, %s, %s, %s)""", (Pedido.quantity, Pedido.delivery_amount, Pedido.total, Pedido.payment_screenshot, Pedido.status, Pedido.city, Pedido.municipality, Pedido.payment_method, Pedido.remarks, Pedido.cedula))
                 affected_rows = cursor.rowcount
                 connection.commit()
 
@@ -102,12 +103,28 @@ class OrderModel():
             connection = get_connection()
 
             with connection.cursor() as cursor:
-                cursor.execute("""UPDATE pedidos SET  status= %s WHERE order_number = %s""", (status, Num_orden))
+                cursor.execute("""UPDATE pedidos SET  status= %s WHERE order_number = %s::bytea""", (status, Num_orden))
                 affected_rows = cursor.rowcount
                 connection.commit()
 
                 
             connection.close()
+            return affected_rows
+        except Exception as ex:
+            raise Exception(ex)
+    
+    @classmethod
+    def add_screenshot(self, Num_orden, screenshot):
+        try:
+            connection = get_connection()
+
+            with connection.cursor() as cursor:
+                cursor.execute("UPDATE pedidos SET payments_screenshot= %s WHERE order_number= %s",(screenshot, Num_orden))
+                affected_rows = cursor.rowcount
+                connection.commit()
+
+            connection.close()
+            
             return affected_rows
         except Exception as ex:
             raise Exception(ex)

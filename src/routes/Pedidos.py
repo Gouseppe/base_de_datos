@@ -45,8 +45,10 @@ def get_Pedidos():
         else:
             print('todo')
             Pedidos = OrderModel.get_Pedidos(date, status, cedula, 8)
-        
+
+
         return jsonify(Pedidos)
+
     except Exception as ex:
         return jsonify({'message': str(ex)}), 500
 
@@ -94,9 +96,11 @@ def add_Pedido():
             
             
             result = OrderModel.add_Pedido(order)
-
+            print("hola")
+            result2 = OrderModel.get_Pedido()
+            print('hola')
         if result == 1:
-            return "fino"
+            return jsonify(result2)
         else:
             return jsonify({'message': "Error on insert"}), 500
 
@@ -117,6 +121,21 @@ def status_Pedido(order_number):
             return jsonify({'message': "No status updated"}), 404
     except Exception as ex:
        return jsonify({'message': str(ex)}), 500
+
+@main.route('/<order_number>/payment-screenshot', methods=['POST'])
+def add_screenshot(order_number):
+    try:
+        payment_screenshot = request.files['screenshot']
+        result = OrderModel.add_screenshot(order_number,payment_screenshot.filename)
+
+        if result == 1:
+            
+            return jsonify(order_number)
+        else:
+            return jsonify({'message': "Error on insert"}), 500
+
+    except Exception as ex:
+        return jsonify({'message': str(ex)}), 500
 
 
 # @main.route('/<order_number>', methods=['PUT'])
